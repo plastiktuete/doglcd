@@ -25,7 +25,7 @@ DogLcd lcd(2, 3, 4, 5);
 
 void setup() {
   // set up the LCD type and the contrast setting for the display 
-  lcd.begin(DOG_LCD_M162,0x28);
+  lcd.begin(DOG_LCD_M162);
   // Print a message to the LCD.
   lcd.print("hello, world!");
 }

@@ -88,19 +88,31 @@ class DogLcd : public Print {
      * <code>OG_LCD_M162</code> or <code>DOG_LCD_M163</code> 
      * defined in this class.
      * @param contrast the contrast setting for the display. Values
-     * between 0x00 and 0x3f are allowed. 
+     * between 0x00 and 0x3f are allowed. The default 0x28 is a valuen that 
+     * worked well with all displays I have tested so far.  
      * @param vcc the supply voltage on which the display runs. This must
      * one of the constants <code>DOG_LCD_VCC_5V</code> 
      * or <code>DOG_LCD_VCC_3V3</code>  
      * @return 0 if the display was sucessfully initialized, 
      * -1 otherwise.
      */
-    int begin(int model, int contrast, int vcc=DOG_LCD_VCC_5V);
+    int begin(int model, int contrast=0x28, int vcc=DOG_LCD_VCC_5V);
 
     /**
      * Reset the display.
      */
     void reset();
+
+    /**
+     * Set the contrast for the display.
+     * @param contrast the contrast to be used for the display. Setting 
+     * the contrast to a value < 32 will probably give the impression
+     * that the display isn't working because nothing is printed.  
+     * The displays that I tested worked firn with a contrast >= 0x28.
+     * The valid range for the contrast value is 0.63 (0x00..0x3F hex).
+     * If the value is outside the valid range the method does nothing.
+     */
+    void setContrast(int contrast);
 
     /**
      * Clears the display and moves the cursor back to 

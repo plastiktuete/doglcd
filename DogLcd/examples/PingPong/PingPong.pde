@@ -27,7 +27,7 @@ DogLcd pong(2, 3, 4, 6);
 
 void setup() {
   // set up the LCD type and the contrast setting for the ping display
-  ping.begin(DOG_LCD_M162,0x28);
+  ping.begin(DOG_LCD_M162,0x1F);
   // set up the LCD type and the contrast setting for the pong display 
   pong.begin(DOG_LCD_M162,0x28);
   //clear both displays

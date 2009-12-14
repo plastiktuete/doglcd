@@ -108,26 +108,9 @@ void DogLcd::reset() {
 	//bias 1/4
 	writeCommand(0x1D,30);
     }
-
-    //follower control
+    //set the follower control
     writeCommand(0x69,30);
-
-    if(this->vcc==DOG_LCD_VCC_5V) { 
-	/*
-	  For 5v operation the booster must be off
-	  set (2-bit) high-nibble of contrast
-	*/
-	writeCommand((0x50 | ((contrast>>4)&0x03)),30);
-    }
-    else {
-	/*
-	  For 3.3v operation the booster must be on
-	  set (2-bit) high-nibble of contrast
-	*/
-	writeCommand((0x54 | ((contrast>>4)&0x03)),30);
-    }	
-    //set low-byte of contrast
-    writeCommand((0x70 | (contrast & 0x0F)),30);
+    setContrast(this->contrast);
     //Standard setting is : display on, cursor on, no blink
     displayMode=0x04;
     cursorMode=0x02;
@@ -137,6 +120,27 @@ void DogLcd::reset() {
     clear();
     leftToRight();
 }
+
+void DogLcd::setContrast(int contrast) {
+    if(contrast<0 || contrast>0x3F)
+	return;
+    if(this->vcc==DOG_LCD_VCC_5V) { 
+	/*
+	  For 5v operation the booster must be off, which is on the 
+	  same command as the (2-bit) high-nibble of contrast
+	*/
+	writeCommand((0x50 | ((contrast>>4)&0x03)),30);
+    }
+    else {
+	/*
+	  For 3.3v operation the booster must be on, which is on the 
+	   same command as the (2-bit) high-nibble of contrast
+	*/
+	writeCommand((0x54 | ((contrast>>4)&0x03)),30);
+    }	
+    //set low-nibble of the contrast
+    writeCommand((0x70 | (contrast & 0x0F)),30);
+}    
     
 void DogLcd::clear() {
     writeCommand(0x01,1080);
