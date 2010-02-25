@@ -31,18 +31,18 @@ class DogLcd : public Print {
     int startAddress[3];
     
     /** The (arduino-)pin used for the serial data */
-    int SI;
+    int doglcdSI;
     /** The (arduino-)pin used for the serial clock */
-    int CLK;
+    int doglcdCLK;
     /** 
      * The (arduino-)pin that toggles between sending a command
      * or character data to the display
      */
-    int RS;
+    int doglcdRS;
     /** The (arduino-)pin used selecting the display */
-    int CSB;
+    int doglcdCSB;
     /** The (arduino-)pin used for resetting the dislay */
-    int RESET;
+    int doglcdRESET;
     /** The (arduino-)pin used for switching the backlight */
     int backLight;
     /** 
@@ -68,18 +68,19 @@ class DogLcd : public Print {
     /**
      * Creates a new instance of DogLcd and asigns the (arduino-)pins
      * used to control the display.
-     * @param SI The (arduino-)pin connected to the SI-pin on the display
-     * @param CLK The (arduino-)pin connected to the CLK-pin on the display
-     * @param RS The (arduino-)pin connected to the RS-pin on the display
-     * @param CSB The (arduino-)pin connected to the CSB-pin on the display
+     * @param doglcdSI The (arduino-)pin connected to the SI-pin on the display
+     * @param doglcdCLK The (arduino-)pin connected to the CLK-pin on the display
+     * @param doglcdRS The (arduino-)pin connected to the RS-pin on the display
+     * @param doglcdCSB The (arduino-)pin connected to the CSB-pin on the display
      * @param backLight If you hardware supports switching the backlight 
      * on the display from software this is the (arduino-)pin to be used.
-     * @param RESET If you want your code to reset the display from
+     * @param doglcdRESET If you want your code to reset the display from
      * software this is the (arduino-)pin where the RESET-pin of 
      * the display is connected. If you don't need this feature simply 
      * connect the RESET-pin on the display to VCC.
      */
-    DogLcd(int SI, int CLK, int RS, int CSB, int RESET=-1, int backLight=-1);
+    DogLcd(int doglcdSI, int doglcdCLK, int doglcdRS, int doglcdCSB, 
+	   int doglcdRESET=-1, int backLight=-1);
     
     /**
      * Resets and initializes the Display.

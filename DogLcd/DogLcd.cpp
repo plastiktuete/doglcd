@@ -3,27 +3,28 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+
 #include "WProgram.h"
 
-DogLcd::DogLcd(int SI, int CLK, int RS, int CSB, int RESET, int backLight) {
-    this->SI=SI;
-    this->CLK=CLK;
-    this->RS=RS;
-    this->CSB=CSB;
-    this->RESET=RESET;
+DogLcd::DogLcd(int doglcdSI, int doglcdCLK, int doglcdRS, int doglcdCSB, int doglcdRESET, int backLight) {
+    this->doglcdSI=doglcdSI;
+    this->doglcdCLK=doglcdCLK;
+    this->doglcdRS=doglcdRS;
+    this->doglcdCSB=doglcdCSB;
+    this->doglcdRESET=doglcdRESET;
     this->backLight=backLight;
     //the first pin to go HIGH, we dont want to send any commands by accident
-    pinMode(this->SI,OUTPUT);
-    pinMode(this->CLK,OUTPUT);
-    pinMode(this->RS,OUTPUT);
-    pinMode(this->CSB,OUTPUT);
-    pinMode(this->RESET,OUTPUT);
+    pinMode(this->doglcdSI,OUTPUT);
+    pinMode(this->doglcdCLK,OUTPUT);
+    pinMode(this->doglcdRS,OUTPUT);
+    pinMode(this->doglcdCSB,OUTPUT);
+    pinMode(this->doglcdRESET,OUTPUT);
    
-    digitalWrite(this->CSB,HIGH);
-    digitalWrite(this->RESET,HIGH);
-    digitalWrite(this->CLK,HIGH);
-    digitalWrite(this->SI,HIGH);
-    digitalWrite(this->RS,HIGH);
+    digitalWrite(this->doglcdCSB,HIGH);
+    digitalWrite(this->doglcdRESET,HIGH);
+    digitalWrite(this->doglcdCLK,HIGH);
+    digitalWrite(this->doglcdSI,HIGH);
+    digitalWrite(this->doglcdRS,HIGH);
     if(this->backLight!=-1) {
 	pinMode(this->backLight,OUTPUT);
 	digitalWrite(this->backLight,LOW);
@@ -79,11 +80,11 @@ int DogLcd::begin(int model, int contrast, int vcc) {
 }
 
 void DogLcd::reset() {
-    if(RESET!=-1) {
+    if(doglcdRESET!=-1) {
 	//If user wired the reset line, pull it low and wait for 40 millis
-	digitalWrite(RESET,LOW);
+	digitalWrite(doglcdRESET,LOW);
 	delay(40);
-	digitalWrite(RESET,HIGH);
+	digitalWrite(doglcdRESET,HIGH);
 	delay(40);
     }
     else {
@@ -108,8 +109,6 @@ void DogLcd::reset() {
 	//bias 1/4
 	writeCommand(0x1D,30);
     }
-    //set the follower control
-    writeCommand(0x69,30);
     setContrast(this->contrast);
     //Standard setting is : display on, cursor on, no blink
     displayMode=0x04;
@@ -130,13 +129,20 @@ void DogLcd::setContrast(int contrast) {
 	  same command as the (2-bit) high-nibble of contrast
 	*/
 	writeCommand((0x50 | ((contrast>>4)&0x03)),30);
+	/* Set amplification ratio for the follower control */
+	writeCommand(0x69,30);
     }
     else {
 	/*
 	  For 3.3v operation the booster must be on, which is on the 
-	   same command as the (2-bit) high-nibble of contrast
+	  same command as the (2-bit) high-nibble of contrast
 	*/
 	writeCommand((0x54 | ((contrast>>4)&0x03)),30);
+	/* 
+	   Set amplification ratio for the follower control
+	   this has to be higher it seems at 3.3V operation
+	 */
+	writeCommand(0x6B,30);
     }	
     //set low-nibble of the contrast
     writeCommand((0x70 | (contrast & 0x0F)),30);
@@ -270,29 +276,29 @@ void DogLcd::setBacklight(int value, bool usePWM) {
 }
 
 void DogLcd::writeChar(int value) {
-    digitalWrite(RS,HIGH);
+    digitalWrite(doglcdRS,HIGH);
     spiTransfer(value,30);
 }
 
 void DogLcd::writeCommand(int value,int executionTime) {
-    digitalWrite(RS,LOW);
+    digitalWrite(doglcdRS,LOW);
     spiTransfer(value,executionTime);
 }
 
 void DogLcd::spiTransfer(int value, int executionTime) {
-    digitalWrite(CLK,HIGH);
-    digitalWrite(CSB,LOW);
+    digitalWrite(doglcdCLK,HIGH);
+    digitalWrite(doglcdCSB,LOW);
     for(int i=7;i>=0;i--) {
 	if(bitRead(value,i)) {
-	    digitalWrite(SI,HIGH);
+	    digitalWrite(doglcdSI,HIGH);
 	}
 	else {
-	    digitalWrite(SI,LOW);
+	    digitalWrite(doglcdSI,LOW);
 	}
-	digitalWrite(CLK,LOW);
-	digitalWrite(CLK,HIGH);
+	digitalWrite(doglcdCLK,LOW);
+	digitalWrite(doglcdCLK,HIGH);
     }
-    digitalWrite(CSB,HIGH);
+    digitalWrite(doglcdCSB,HIGH);
     delayMicroseconds(executionTime);
 }
 
