@@ -6,25 +6,25 @@
 
 #include "WProgram.h"
 
-DogLcd::DogLcd(int doglcdSI, int doglcdCLK, int doglcdRS, int doglcdCSB, int doglcdRESET, int backLight) {
-    this->doglcdSI=doglcdSI;
-    this->doglcdCLK=doglcdCLK;
-    this->doglcdRS=doglcdRS;
-    this->doglcdCSB=doglcdCSB;
-    this->doglcdRESET=doglcdRESET;
+DogLcd::DogLcd(int lcdSI, int lcdCLK, int lcdRS, int lcdCSB, int lcdRESET, int backLight) {
+    this->lcdSI=lcdSI;
+    this->lcdCLK=lcdCLK;
+    this->lcdRS=lcdRS;
+    this->lcdCSB=lcdCSB;
+    this->lcdRESET=lcdRESET;
     this->backLight=backLight;
     //the first pin to go HIGH, we dont want to send any commands by accident
-    pinMode(this->doglcdSI,OUTPUT);
-    pinMode(this->doglcdCLK,OUTPUT);
-    pinMode(this->doglcdRS,OUTPUT);
-    pinMode(this->doglcdCSB,OUTPUT);
-    pinMode(this->doglcdRESET,OUTPUT);
+    pinMode(this->lcdSI,OUTPUT);
+    pinMode(this->lcdCLK,OUTPUT);
+    pinMode(this->lcdRS,OUTPUT);
+    pinMode(this->lcdCSB,OUTPUT);
+    pinMode(this->lcdRESET,OUTPUT);
    
-    digitalWrite(this->doglcdCSB,HIGH);
-    digitalWrite(this->doglcdRESET,HIGH);
-    digitalWrite(this->doglcdCLK,HIGH);
-    digitalWrite(this->doglcdSI,HIGH);
-    digitalWrite(this->doglcdRS,HIGH);
+    digitalWrite(this->lcdCSB,HIGH);
+    digitalWrite(this->lcdRESET,HIGH);
+    digitalWrite(this->lcdCLK,HIGH);
+    digitalWrite(this->lcdSI,HIGH);
+    digitalWrite(this->lcdRS,HIGH);
     if(this->backLight!=-1) {
 	pinMode(this->backLight,OUTPUT);
 	digitalWrite(this->backLight,LOW);
@@ -80,11 +80,11 @@ int DogLcd::begin(int model, int contrast, int vcc) {
 }
 
 void DogLcd::reset() {
-    if(doglcdRESET!=-1) {
+    if(lcdRESET!=-1) {
 	//If user wired the reset line, pull it low and wait for 40 millis
-	digitalWrite(doglcdRESET,LOW);
+	digitalWrite(lcdRESET,LOW);
 	delay(40);
-	digitalWrite(doglcdRESET,HIGH);
+	digitalWrite(lcdRESET,HIGH);
 	delay(40);
     }
     else {
@@ -276,29 +276,29 @@ void DogLcd::setBacklight(int value, bool usePWM) {
 }
 
 void DogLcd::writeChar(int value) {
-    digitalWrite(doglcdRS,HIGH);
+    digitalWrite(lcdRS,HIGH);
     spiTransfer(value,30);
 }
 
 void DogLcd::writeCommand(int value,int executionTime) {
-    digitalWrite(doglcdRS,LOW);
+    digitalWrite(lcdRS,LOW);
     spiTransfer(value,executionTime);
 }
 
 void DogLcd::spiTransfer(int value, int executionTime) {
-    digitalWrite(doglcdCLK,HIGH);
-    digitalWrite(doglcdCSB,LOW);
+    digitalWrite(lcdCLK,HIGH);
+    digitalWrite(lcdCSB,LOW);
     for(int i=7;i>=0;i--) {
 	if(bitRead(value,i)) {
-	    digitalWrite(doglcdSI,HIGH);
+	    digitalWrite(lcdSI,HIGH);
 	}
 	else {
-	    digitalWrite(doglcdSI,LOW);
+	    digitalWrite(lcdSI,LOW);
 	}
-	digitalWrite(doglcdCLK,LOW);
-	digitalWrite(doglcdCLK,HIGH);
+	digitalWrite(lcdCLK,LOW);
+	digitalWrite(lcdCLK,HIGH);
     }
-    digitalWrite(doglcdCSB,HIGH);
+    digitalWrite(lcdCSB,HIGH);
     delayMicroseconds(executionTime);
 }
 
