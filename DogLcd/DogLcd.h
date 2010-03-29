@@ -197,7 +197,7 @@ class DogLcd : public Print {
      * @param charMap an array of 8 bytes that contains the char
      * definition. 
      */
-    void createChar(int charCode, int charMap[]);
+    void createChar(int charCode, uint8_t charMap[]);
 
     /**
      * Set the cursor to a new loaction.

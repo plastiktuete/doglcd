@@ -13,25 +13,26 @@ DogLcd::DogLcd(int lcdSI, int lcdCLK, int lcdRS, int lcdCSB, int lcdRESET, int b
     this->lcdCSB=lcdCSB;
     this->lcdRESET=lcdRESET;
     this->backLight=backLight;
-    //the first pin to go HIGH, we dont want to send any commands by accident
-    pinMode(this->lcdSI,OUTPUT);
-    pinMode(this->lcdCLK,OUTPUT);
-    pinMode(this->lcdRS,OUTPUT);
+}
+
+int DogLcd::begin(int model, int contrast, int vcc) {
+    //init all pins to go HIGH, we dont want to send any commands by accident
     pinMode(this->lcdCSB,OUTPUT);
-    pinMode(this->lcdRESET,OUTPUT);
-   
     digitalWrite(this->lcdCSB,HIGH);
-    digitalWrite(this->lcdRESET,HIGH);
-    digitalWrite(this->lcdCLK,HIGH);
+    pinMode(this->lcdSI,OUTPUT);
     digitalWrite(this->lcdSI,HIGH);
+    pinMode(this->lcdCLK,OUTPUT);
+    digitalWrite(this->lcdCLK,HIGH);
+    pinMode(this->lcdRS,OUTPUT);
     digitalWrite(this->lcdRS,HIGH);
+    if(this->lcdRESET!=-1) {
+	pinMode(this->lcdRESET,OUTPUT);
+	digitalWrite(this->lcdRESET,HIGH);
+    }
     if(this->backLight!=-1) {
 	pinMode(this->backLight,OUTPUT);
 	digitalWrite(this->backLight,LOW);
     }
-}
-
-int DogLcd::begin(int model, int contrast, int vcc) {
     if(model==DOG_LCD_M081) {
 	this->model=model;
 	rows=1;
@@ -224,7 +225,7 @@ void DogLcd::noAutoscroll(void) {
     writeCommand(entryMode,30);
 }
 
-void DogLcd::createChar(int charPos, int charMap[]) {
+void DogLcd::createChar(int charPos, uint8_t charMap[]) {
     int baseAddress;
     if(charPos<0 || charPos>7)
 	return;
