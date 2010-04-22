@@ -1,3 +1,19 @@
+/*
+ * This is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * DogLcd is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with DogLcd.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2010 Eberhard Fahle <e.fahle@wayoda.org>
+ */
 #ifndef DOG_LCD_h
 #define DOG_LCD_h
 
@@ -63,7 +79,8 @@ class DogLcd : public Print {
 
     /** the entrymode currently used */
     int entryMode;
-
+    /** The template for changing the instruction set */
+    uint8_t instructionSetTemplate;
  public:
     /**
      * Creates a new instance of DogLcd and asigns the (arduino-)pins
@@ -232,6 +249,12 @@ class DogLcd : public Print {
     void setBacklight(int value,bool PWM=false);
 
  private:
+    /** 
+     * Set the intruction set to use for the next command
+     * @param is the index of the instructionSet to use
+     */
+    void setInstructionSet(int is);
+ 
     /**
      * Call the displaymode function when cursor settings
      * have been changed

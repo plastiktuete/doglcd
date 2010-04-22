@@ -1,3 +1,19 @@
+/*
+ * This is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * DogLcd is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with DogLcd.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2010 Eberhard Fahle <e.fahle@wayoda.org>
+ */
 #include "DogLcd.h"
 
 #include <stdio.h>
@@ -93,23 +109,21 @@ void DogLcd::reset() {
 	delay(50);
     }
     if(model==DOG_LCD_M081) {
-	//8-bit,1-line,switch to instruction set 1
-	writeCommand(0x31,30);
-	//bias 1/4 
-	writeCommand(0x1C,30);
+	//8-bit,1-line
+	instructionSetTemplate=(uint8_t)0x30;
     }
     else if(model==DOG_LCD_M162) {
-	//8-bit,2-line,switch to instruction set 1
-	writeCommand(0x39,30);
-	//bias 1/4
-	writeCommand(0x1C,30);
+	//8-bit,2-line
+	instructionSetTemplate=(uint8_t)0x38;
     }
     else if(model==DOG_LCD_M163) {
-	//8-bit,2-line,switch to instruction set 1
-	writeCommand(0x39,30);
-	//bias 1/4
-	writeCommand(0x1D,30);
+	//8-bit,2-line
+	instructionSetTemplate=(uint8_t)0x38;
     }
+    //init data-size and lines, then change to instructionset 1
+    setInstructionSet(1);
+    //bias 1/4
+    writeCommand(0x1D,30);
     setContrast(this->contrast);
     //Standard setting is : display on, cursor on, no blink
     displayMode=0x04;
@@ -163,7 +177,6 @@ void DogLcd::setCursor(int col, int row) {
 	return;
     }
     int address=(startAddress[row]+col) & 0x7F;
-    Serial.println(address,HEX);
     writeCommand(0x80|address,30);
 }
 
@@ -198,10 +211,12 @@ void DogLcd::blink() {
 }
 
 void DogLcd::scrollDisplayLeft(void) {
+    setInstructionSet(0);
     writeCommand(0x18,30);
 }
 
 void DogLcd::scrollDisplayRight(void) {
+    setInstructionSet(0);
     writeCommand(0x1C,30);
 }
 
@@ -225,32 +240,56 @@ void DogLcd::noAutoscroll(void) {
     writeCommand(entryMode,30);
 }
 
-void DogLcd::createChar(int charPos, uint8_t charMap[]) {
-    int baseAddress;
-    if(charPos<0 || charPos>7)
-	return;
-    baseAddress=charPos*8;
-    writeCommand(0x30,30);
-    for (int i=0; i<8; i++) {
-    	writeCommand((0x40|(baseAddress+i)),30);
-	writeChar(charMap[i]);
-    }
-    /*
-      The numner of lines onn the display belong to the 'Function Set'.
-      We have to restore this withn different value for each model
-    */
-    if(model==DOG_LCD_M081) {
-	//8-bit,1-line,switch to instruction set 0
-	writeCommand(0x30,30);
-    }
-    else if(model==DOG_LCD_M162) {
-	//8-bit,2-line,switch to instruction set 0
-	writeCommand(0x38,30);
-    }
-    else if(model==DOG_LCD_M163) {
-	//8-bit,2-line,switch to instruction set 0
-	writeCommand(0x38,30);
-    }
+// void DogLcd::createChar(int charPos, uint8_t charMap[]) {
+//     int baseAddress;
+//     if(charPos<0 || charPos>7)
+// 	return;
+//     baseAddress=charPos*8;
+//     for (int i=0; i<8; i++) {
+// 	writeCommand(0x30,30);
+//     	writeCommand((0x40|(baseAddress+i)),30);
+// 	writeChar(charMap[i]);
+//     }
+//     /*
+//       The numner of lines onn the display belong to the 'Function Set'.
+//       We have to restore this withn different value for each model
+//     */
+//     if(model==DOG_LCD_M081) {
+// 	//8-bit,1-line,switch to instruction set 0
+// 	writeCommand(0x30,30);
+//     }
+//     else if(model==DOG_LCD_M162) {
+// 	//8-bit,2-line,switch to instruction set 0
+// 	writeCommand(0x38,30);
+//     }
+//     else if(model==DOG_LCD_M163) {
+// 	//8-bit,2-line,switch to instruction set 0
+// 	writeCommand(0x38,30);
+//     }
+// }
+
+ void DogLcd::createChar(int charPos, uint8_t charMap[]) {
+     int baseAddress;
+     if(charPos<0 || charPos>7)
+	 return;
+     baseAddress=charPos*8;
+     //changing CGRAM address belongs to different instruction set
+	 setInstructionSet(0);
+     for (int i=0; i<8; i++) {
+	 // 	writeCommand(0x30,30);
+	 // 	//setInstructionSet(0);
+	 writeCommand((0x40|(baseAddress+i)),30);
+	 writeChar(charMap[i]);
+     }
+//     /*
+//       The number of lines on the display belong to the 'Function Set'.
+//       We have to restore this with the correct settings for each model
+//     */
+//     writeCommand(0x38,30);
+     setInstructionSet(0);
+     writeDisplayMode();
+//     writeChar(charPos);
+
 }
 
 void DogLcd::writeDisplayMode() {
@@ -274,6 +313,13 @@ void DogLcd::setBacklight(int value, bool usePWM) {
 	    analogWrite(backLight,value);
 	}
     }
+}
+
+void DogLcd::setInstructionSet(int is) {
+    if(is<0 || is>3)
+	return;
+    int cmd=instructionSetTemplate | is;
+    writeCommand(cmd,30);
 }
 
 void DogLcd::writeChar(int value) {
