@@ -18,6 +18,7 @@
 #define DOG_LCD_h
 
 #include <inttypes.h>
+#include "WProgram.h"
 #include "Print.h"
 
 /** Define the available models */
