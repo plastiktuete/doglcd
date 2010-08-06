@@ -20,6 +20,8 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "WProgram.h"
+
 DogLcd::DogLcd(int lcdSI, int lcdCLK, int lcdRS, int lcdCSB, int lcdRESET, int backLight) {
     this->lcdSI=lcdSI;
     this->lcdCLK=lcdCLK;
