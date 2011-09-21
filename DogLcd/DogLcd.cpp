@@ -20,7 +20,11 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "WProgram.h"
+#if (ARDUINO >= 100)
+#include <Arduino.h>
+#else
+#include <WProgram.h>
+#endif
 
 DogLcd::DogLcd(int lcdSI, int lcdCLK, int lcdRS, int lcdCSB, int lcdRESET, int backLight) {
     this->lcdSI=lcdSI;
