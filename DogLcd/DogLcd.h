@@ -231,8 +231,9 @@ class DogLcd : public Print {
      * is called whenever a character is to be printed to the
      * display. 
      * @param c the character to be printed. 
+     * @return int number of characters written
      */ 
-    virtual void write(uint8_t c);
+    virtual size_t write(uint8_t c);
     
     /**
      * Set the backlight. This is obviously only possible
