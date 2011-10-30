@@ -225,7 +225,15 @@ class DogLcd : public Print {
      * the cursor stays where it is.
      */
     void setCursor(int col, int row); 
-    
+
+    /*
+       Using namespace Print::write makes it possible to 
+       to send data to the Lcd via a lcd.write(const char *) or
+       a lcd.write(const uint8_t *,int) call.
+    */
+    using Print::write;    
+
+#if ARDUINO >= 100
     /**
      * Implements the write()-method from the base-class that
      * is called whenever a character is to be printed to the
@@ -233,8 +241,17 @@ class DogLcd : public Print {
      * @param c the character to be printed. 
      * @return int number of characters written
      */ 
-    virtual size_t write(uint8_t c);
-    
+     virtual size_t write(uint8_t c) { writeChar(c); return 1; }
+#else
+    /**
+     * Implements the write()-method from the base-class that
+     * is called whenever a character is to be printed to the
+     * display. 
+     * @param c the character to be printed. 
+     */ 
+    virtual void write(uint8_t c) { writeChar(c); }
+#endif
+
     /**
      * Set the backlight. This is obviously only possible
      * if you have build a small circuit for switching/dimming the 

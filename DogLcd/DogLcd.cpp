@@ -316,7 +316,3 @@ void DogLcd::spiTransfer(int value, int executionTime) {
     delayMicroseconds(executionTime);
 }
 
-size_t DogLcd::write(uint8_t c) {
-    writeChar(c);
-    return 1;
-}
