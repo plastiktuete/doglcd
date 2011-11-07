@@ -228,12 +228,14 @@ class DogLcd : public Print {
 
     /*
        Using namespace Print::write makes it possible to 
-       to send data to the Lcd via a lcd.write(const char *) or
-       a lcd.write(const uint8_t *,int) call.
+       to send data to the Lcd via the lcd.write(const char *) or
+       a lcd.write(const uint8_t *,int) methods.
     */
     using Print::write;    
 
 #if ARDUINO >= 100
+    //The Print::write() signatuire was changed with Arduino versions >= 1.0
+
     /**
      * Implements the write()-method from the base-class that
      * is called whenever a character is to be printed to the
@@ -242,7 +244,10 @@ class DogLcd : public Print {
      * @return int number of characters written
      */ 
      virtual size_t write(uint8_t c) { writeChar(c); return 1; }
+
 #else
+    //This keeps the library compatible with pre-1.0 versions of the Arduino core
+
     /**
      * Implements the write()-method from the base-class that
      * is called whenever a character is to be printed to the
